@@ -55,9 +55,11 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* Window Controls - hidden when using OS decorations */
+/* Window Controls */
 .window-controls {
-  display: none;
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
 }
 
 .window-control {
@@ -144,13 +146,27 @@ body {
 /* Results Panel (Left) */
 .results-panel {
   width: var(--sidebar-width);
-  min-width: 280px;
-  max-width: 500px;
+  min-width: 200px;
+  max-width: 600px;
   display: flex;
   flex-direction: column;
   background-color: var(--bg-secondary);
-  border-right: 1px solid var(--border);
+  border-right: none;
   overflow: hidden;
+}
+
+/* Resizable Divider */
+.resize-handle {
+  width: 6px;
+  cursor: col-resize;
+  background-color: var(--border);
+  transition: background-color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.resize-handle:hover,
+.resize-handle.dragging {
+  background-color: var(--accent);
 }
 
 .results-header {

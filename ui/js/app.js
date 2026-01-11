@@ -5,9 +5,11 @@ const WindowControls = {
   init() {
     const { invoke } = window.__TAURI__.core;
 
-    // Drag functionality - attach to header
+    // Drag functionality - attach to header using Tauri's drag region
     const header = document.querySelector('.header');
     if (header) {
+      let isDragging = false;
+
       header.addEventListener('mousedown', async (e) => {
         // Don't drag if clicking on interactive elements
         if (e.target.closest('.search-container') ||
@@ -16,11 +18,18 @@ const WindowControls = {
             e.target.closest('input')) {
           return;
         }
+
+        // Only drag on left mouse button
+        if (e.button !== 0) return;
+
+        isDragging = true;
         try {
           await invoke('window_start_drag');
         } catch (err) {
-          console.error('Drag error:', err);
+          // Silently ignore drag errors - they can occur during rapid clicks
+          console.debug('Drag:', err);
         }
+        isDragging = false;
       });
     }
 
@@ -67,6 +76,50 @@ const WindowControls = {
 };
 
 window.WindowControls = WindowControls;
+
+// Resizable panel divider
+const ResizeHandle = {
+  init() {
+    const handle = document.getElementById('resize-handle');
+    const resultsPanel = document.getElementById('results-panel');
+    const mainContent = document.querySelector('.main-content');
+
+    if (!handle || !resultsPanel || !mainContent) return;
+
+    let isResizing = false;
+    let startX = 0;
+    let startWidth = 0;
+
+    handle.addEventListener('mousedown', (e) => {
+      isResizing = true;
+      startX = e.clientX;
+      startWidth = resultsPanel.offsetWidth;
+      handle.classList.add('dragging');
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isResizing) return;
+
+      const delta = e.clientX - startX;
+      const newWidth = Math.min(Math.max(startWidth + delta, 200), 600);
+      resultsPanel.style.width = `${newWidth}px`;
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (isResizing) {
+        isResizing = false;
+        handle.classList.remove('dragging');
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      }
+    });
+  }
+};
+
+window.ResizeHandle = ResizeHandle;
 
 // Dialogs helper
 const Dialogs = {
@@ -155,6 +208,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Initialize all modules
   WindowControls.init();
+  ResizeHandle.init();
   Dialogs.init();
   await Settings.init();
   Search.init();
