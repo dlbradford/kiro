@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kiro GUI - Test Runner</title>
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --bg-section: #16213e;
+      --text: #eaeaea;
+      --text-muted: #a0a0a0;
+      --accent: #e94560;
+      --success: #4ecca3;
+      --warning: #ffc107;
+      --border: #2a2a4a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem;
+    }
+
+    h1 {
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .test-section {
+      background-color: var(--bg-section);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+
+    .section-header {
+      background-color: rgba(233, 69, 96, 0.1);
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-title {
+      color: var(--accent);
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .test-list {
+      padding: 1rem 1.5rem;
+    }
+
+    .test-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .test-item:last-child {
+      border-bottom: none;
+    }
+
+    .test-checkbox {
+      margin-right: 1rem;
+      margin-top: 2px;
+      width: 18px;
+      height: 18px;
+      accent-color: var(--success);
+    }
+
+    .test-content {
+      flex: 1;
+    }
+
+    .test-name {
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+
+    .test-steps {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .test-expected {
+      font-size: 0.875rem;
+      color: var(--success);
+      margin-top: 0.25rem;
+    }
+
+    .summary {
+      background-color: var(--bg-section);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .summary-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .summary-stats {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .stat-passed .stat-value {
+      color: var(--success);
+    }
+
+    .stat-failed .stat-value {
+      color: var(--accent);
+    }
+
+    .stat-pending .stat-value {
+      color: var(--warning);
+    }
+
+    .instructions {
+      background-color: rgba(78, 204, 163, 0.1);
+      border: 1px solid var(--success);
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .instructions h3 {
+      color: var(--success);
+      margin-bottom: 0.5rem;
+    }
+
+    .instructions p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <h1>Kiro GUI Test Suite</h1>
+  <p class="subtitle">Manual test cases for verifying application functionality</p>
+
+  <div class="instructions">
+    <h3>Instructions</h3>
+    <p>Run the Kiro GUI application with <code>cargo tauri dev</code>, then manually verify each test case below. Check the box when a test passes. Reload this page to reset all checkboxes.</p>
+  </div>
+
+  <!-- Search Tests -->
+  <div class="test-section">
+    <div class="section-header">
+      <h2 class="section-title">1. Search Tests</h2>
+    </div>
+    <div class="test-list">
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="search-1">
+        <div class="test-content">
+          <div class="test-name">1.1 Empty search shows all notes</div>
+          <div class="test-steps">Steps: Clear search input, wait for results</div>
+          <div class="test-expected">Expected: All notes displayed (up to 500), sorted by date</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="search-2">
+        <div class="test-content">
+          <div class="test-name">1.2 Text search filters results</div>
+          <div class="test-steps">Steps: Type a keyword that exists in some notes</div>
+          <div class="test-expected">Expected: Only matching notes shown, count updates</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="search-3">
+        <div class="test-content">
+          <div class="test-name">1.3 Year filter (y:2024)</div>
+          <div class="test-steps">Steps: Type "y:2024" in search</div>
+          <div class="test-expected">Expected: Only notes from 2024 shown</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="search-4">
+        <div class="test-content">
+          <div class="test-name">1.4 Month filter (m:01/24)</div>
+          <div class="test-steps">Steps: Type "m:01/24" in search</div>
+          <div class="test-expected">Expected: Only notes from January 2024 shown</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="search-5">
+        <div class="test-content">
+          <div class="test-name">1.5 Combined filter (y:2024 keyword)</div>
+          <div class="test-steps">Steps: Type "y:2024 sample" in search</div>
+          <div class="test-expected">Expected: Only notes from 2024 containing "sample"</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="search-6">
+        <div class="test-content">
+          <div class="test-name">1.6 Search updates as user types</div>
+          <div class="test-steps">Steps: Type slowly, observe results changing</div>
+          <div class="test-expected">Expected: Results update with ~150ms debounce</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Note CRUD Tests -->
+  <div class="test-section">
+    <div class="section-header">
+      <h2 class="section-title">2. Note CRUD Tests</h2>
+    </div>
+    <div class="test-list">
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="crud-1">
+        <div class="test-content">
+          <div class="test-name">2.1 Create note via search</div>
+          <div class="test-steps">Steps: Type "New Test Note" with no matches, press Enter</div>
+          <div class="test-expected">Expected: New note created, editor opens with title set</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="crud-2">
+        <div class="test-content">
+          <div class="test-name">2.2 Read note preview</div>
+          <div class="test-steps">Steps: Click on a result item</div>
+          <div class="test-expected">Expected: Preview panel shows title, dates, word count, body</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="crud-3">
+        <div class="test-content">
+          <div class="test-name">2.3 Update note</div>
+          <div class="test-steps">Steps: Select note, press Enter, edit body, press Ctrl+S</div>
+          <div class="test-expected">Expected: Changes saved, toast confirmation shown</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="crud-4">
+        <div class="test-content">
+          <div class="test-name">2.4 Delete single note</div>
+          <div class="test-steps">Steps: Select note (no marks), press 'd', confirm</div>
+          <div class="test-expected">Expected: Note deleted, removed from list, count updated</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="crud-5">
+        <div class="test-content">
+          <div class="test-name">2.5 Delete multiple marked notes</div>
+          <div class="test-steps">Steps: Mark several notes with Space, press 'd', confirm</div>
+          <div class="test-expected">Expected: All marked notes deleted</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Tests -->
+  <div class="test-section">
+    <div class="section-header">
+      <h2 class="section-title">3. Navigation Tests</h2>
+    </div>
+    <div class="test-list">
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="nav-1">
+        <div class="test-content">
+          <div class="test-name">3.1 Arrow keys / j/k navigation</div>
+          <div class="test-steps">Steps: Press j or ↓ to move down, k or ↑ to move up</div>
+          <div class="test-expected">Expected: Selection moves, preview updates</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="nav-2">
+        <div class="test-content">
+          <div class="test-name">3.2 Jump to first (g)</div>
+          <div class="test-steps">Steps: Navigate to middle, press 'g'</div>
+          <div class="test-expected">Expected: Selection jumps to first result</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="nav-3">
+        <div class="test-content">
+          <div class="test-name">3.3 Jump to last (G)</div>
+          <div class="test-steps">Steps: Press Shift+G</div>
+          <div class="test-expected">Expected: Selection jumps to last result</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="nav-4">
+        <div class="test-content">
+          <div class="test-name">3.4 Page down (Ctrl+D)</div>
+          <div class="test-steps">Steps: Press Ctrl+D</div>
+          <div class="test-expected">Expected: Selection moves down 10 items</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="nav-5">
+        <div class="test-content">
+          <div class="test-name">3.5 Page up (Ctrl+U)</div>
+          <div class="test-steps">Steps: Press Ctrl+U</div>
+          <div class="test-expected">Expected: Selection moves up 10 items</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="nav-6">
+        <div class="test-content">
+          <div class="test-name">3.6 Tab toggles focus</div>
+          <div class="test-steps">Steps: Press Tab repeatedly</div>
+          <div class="test-expected">Expected: Focus alternates between search input and results</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="nav-7">
+        <div class="test-content">
+          <div class="test-name">3.7 Escape clears search</div>
+          <div class="test-steps">Steps: Type in search, press Escape</div>
+          <div class="test-expected">Expected: Search cleared, all results shown</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Marking Tests -->
+  <div class="test-section">
+    <div class="section-header">
+      <h2 class="section-title">4. Marking Tests</h2>
+    </div>
+    <div class="test-list">
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="mark-1">
+        <div class="test-content">
+          <div class="test-name">4.1 Toggle mark with Space</div>
+          <div class="test-steps">Steps: Select a result, press Space</div>
+          <div class="test-expected">Expected: Checkbox toggles, row highlighted, status bar updates</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="mark-2">
+        <div class="test-content">
+          <div class="test-name">4.2 Mark all visible (a)</div>
+          <div class="test-steps">Steps: Press 'a'</div>
+          <div class="test-expected">Expected: All visible results marked</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="mark-3">
+        <div class="test-content">
+          <div class="test-name">4.3 Clear all marks (c)</div>
+          <div class="test-steps">Steps: Mark some notes, press 'c'</div>
+          <div class="test-expected">Expected: All marks cleared, status bar hidden</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="mark-4">
+        <div class="test-content">
+          <div class="test-name">4.4 Mark count in status bar</div>
+          <div class="test-steps">Steps: Mark several notes</div>
+          <div class="test-expected">Expected: "Marked: N" shown in status bar</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="mark-5">
+        <div class="test-content">
+          <div class="test-name">4.5 Marks persist across searches</div>
+          <div class="test-steps">Steps: Mark notes, change search, clear search</div>
+          <div class="test-expected">Expected: Previously marked notes still marked</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="mark-6">
+        <div class="test-content">
+          <div class="test-name">4.6 Click checkbox to toggle mark</div>
+          <div class="test-steps">Steps: Click directly on a checkbox</div>
+          <div class="test-expected">Expected: Mark toggles without changing selection</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Tests -->
+  <div class="test-section">
+    <div class="section-header">
+      <h2 class="section-title">5. Import Tests</h2>
+    </div>
+    <div class="test-list">
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="import-1">
+        <div class="test-content">
+          <div class="test-name">5.1 F2 opens import dialog</div>
+          <div class="test-steps">Steps: Press F2</div>
+          <div class="test-expected">Expected: Import dialog opens with home directories listed</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="import-2">
+        <div class="test-content">
+          <div class="test-name">5.2 Directory selection</div>
+          <div class="test-steps">Steps: Click on directories in the list</div>
+          <div class="test-expected">Expected: Directories toggle selection, checkboxes update</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="import-3">
+        <div class="test-content">
+          <div class="test-name">5.3 File scanning with filter</div>
+          <div class="test-steps">Steps: Select dirs, set filter to "*.txt", click Scan</div>
+          <div class="test-expected">Expected: Matching files listed with names and sizes</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="import-4">
+        <div class="test-content">
+          <div class="test-name">5.4 Import selected files</div>
+          <div class="test-steps">Steps: Select some files, click Import Selected</div>
+          <div class="test-expected">Expected: Files imported, toast shows count</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="import-5">
+        <div class="test-content">
+          <div class="test-name">5.5 Duplicate detection</div>
+          <div class="test-steps">Steps: Try to import same files again</div>
+          <div class="test-expected">Expected: Duplicates skipped, toast shows "X skipped"</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="import-6">
+        <div class="test-content">
+          <div class="test-name">5.6 File date preserved</div>
+          <div class="test-steps">Steps: Import a file, check its created date</div>
+          <div class="test-expected">Expected: Created date matches original file modification date</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export Tests -->
+  <div class="test-section">
+    <div class="section-header">
+      <h2 class="section-title">6. Export Tests</h2>
+    </div>
+    <div class="test-list">
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="export-1">
+        <div class="test-content">
+          <div class="test-name">6.1 F3 exports marked notes</div>
+          <div class="test-steps">Steps: Mark some notes, press F3</div>
+          <div class="test-expected">Expected: Notes exported to ~/Downloads/kiro-export/</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="export-2">
+        <div class="test-content">
+          <div class="test-name">6.2 F3 without marks shows warning</div>
+          <div class="test-steps">Steps: Clear marks, press F3</div>
+          <div class="test-expected">Expected: Warning toast "No notes marked for export"</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="export-3">
+        <div class="test-content">
+          <div class="test-name">6.3 Export file format</div>
+          <div class="test-steps">Steps: Open an exported .md file</div>
+          <div class="test-expected">Expected: Contains # title, dates, and body content</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Editor Tests -->
+  <div class="test-section">
+    <div class="section-header">
+      <h2 class="section-title">7. Editor Tests</h2>
+    </div>
+    <div class="test-list">
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="editor-1">
+        <div class="test-content">
+          <div class="test-name">7.1 Enter opens editor</div>
+          <div class="test-steps">Steps: Select a note, press Enter</div>
+          <div class="test-expected">Expected: Editor opens with title and body loaded</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="editor-2">
+        <div class="test-content">
+          <div class="test-name">7.2 Ctrl+S saves changes</div>
+          <div class="test-steps">Steps: Edit note, press Ctrl+S</div>
+          <div class="test-expected">Expected: Changes saved, toast confirmation</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="editor-3">
+        <div class="test-content">
+          <div class="test-name">7.3 Unsaved changes indicator</div>
+          <div class="test-steps">Steps: Make changes in editor</div>
+          <div class="test-expected">Expected: Yellow dot appears next to title</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="editor-4">
+        <div class="test-content">
+          <div class="test-name">7.4 Escape with unsaved changes</div>
+          <div class="test-steps">Steps: Edit note, press Escape</div>
+          <div class="test-expected">Expected: Confirmation dialog appears</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="editor-5">
+        <div class="test-content">
+          <div class="test-name">7.5 Escape without changes</div>
+          <div class="test-steps">Steps: Open editor, don't edit, press Escape</div>
+          <div class="test-expected">Expected: Returns to search view immediately</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="editor-6">
+        <div class="test-content">
+          <div class="test-name">7.6 Title is required</div>
+          <div class="test-steps">Steps: Clear title, try to save</div>
+          <div class="test-expected">Expected: Warning toast, title input focused</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Keyboard Shortcut Tests -->
+  <div class="test-section">
+    <div class="section-header">
+      <h2 class="section-title">8. Keyboard Shortcut Tests</h2>
+    </div>
+    <div class="test-list">
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="kbd-1">
+        <div class="test-content">
+          <div class="test-name">8.1 Help dialog (?)</div>
+          <div class="test-steps">Steps: Press ? when not typing</div>
+          <div class="test-expected">Expected: Help dialog opens with all shortcuts</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="kbd-2">
+        <div class="test-content">
+          <div class="test-name">8.2 Escape closes dialogs</div>
+          <div class="test-steps">Steps: Open help, press Escape</div>
+          <div class="test-expected">Expected: Dialog closes</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="kbd-3">
+        <div class="test-content">
+          <div class="test-name">8.3 Shortcuts blocked while typing</div>
+          <div class="test-steps">Steps: Focus search, type 'g', 'j', 'k'</div>
+          <div class="test-expected">Expected: Characters typed, not interpreted as shortcuts</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="kbd-4">
+        <div class="test-content">
+          <div class="test-name">8.4 Arrow keys work while typing</div>
+          <div class="test-steps">Steps: Focus search, press Arrow Down</div>
+          <div class="test-expected">Expected: Selection moves in results list</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UI/UX Tests -->
+  <div class="test-section">
+    <div class="section-header">
+      <h2 class="section-title">9. UI/UX Tests</h2>
+    </div>
+    <div class="test-list">
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="ui-1">
+        <div class="test-content">
+          <div class="test-name">9.1 Results show title, date, word count</div>
+          <div class="test-steps">Steps: View results list</div>
+          <div class="test-expected">Expected: Each row shows truncated title, MM/DD/YY date, Nw count</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="ui-2">
+        <div class="test-content">
+          <div class="test-name">9.2 Date format is US (MM/DD/YY)</div>
+          <div class="test-steps">Steps: Check dates in results list</div>
+          <div class="test-expected">Expected: Dates formatted as 01/15/24 (not 15/01/24)</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="ui-3">
+        <div class="test-content">
+          <div class="test-name">9.3 Selected item highlighted</div>
+          <div class="test-steps">Steps: Navigate results</div>
+          <div class="test-expected">Expected: Selected row has distinct background color</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="ui-4">
+        <div class="test-content">
+          <div class="test-name">9.4 Marked items highlighted differently</div>
+          <div class="test-steps">Steps: Mark a note</div>
+          <div class="test-expected">Expected: Marked rows have purple/different background</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="ui-5">
+        <div class="test-content">
+          <div class="test-name">9.5 Status bar shows shortcuts</div>
+          <div class="test-steps">Steps: Check bottom of window</div>
+          <div class="test-expected">Expected: F2 Import, F3 Export, d Delete, ? Help visible</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="ui-6">
+        <div class="test-content">
+          <div class="test-name">9.6 Toast notifications</div>
+          <div class="test-steps">Steps: Perform actions (save, delete, etc.)</div>
+          <div class="test-expected">Expected: Toast appears in bottom-right, auto-dismisses</div>
+        </div>
+      </div>
+      <div class="test-item">
+        <input type="checkbox" class="test-checkbox" data-test="ui-7">
+        <div class="test-content">
+          <div class="test-name">9.7 Scrolling maintains selection visible</div>
+          <div class="test-steps">Steps: Navigate with j/k through long list</div>
+          <div class="test-expected">Expected: Selection scrolls into view automatically</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary">
+    <div class="summary-title">Test Summary</div>
+    <div class="summary-stats">
+      <div class="stat stat-passed">
+        <div class="stat-value" id="passed-count">0</div>
+        <div class="stat-label">Passed</div>
+      </div>
+      <div class="stat stat-failed">
+        <div class="stat-value" id="failed-count">0</div>
+        <div class="stat-label">Failed</div>
+      </div>
+      <div class="stat stat-pending">
+        <div class="stat-value" id="pending-count">0</div>
+        <div class="stat-label">Pending</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Count tests and update summary
+    function updateSummary() {
+      const checkboxes = document.querySelectorAll('.test-checkbox');
+      const total = checkboxes.length;
+      const passed = document.querySelectorAll('.test-checkbox:checked').length;
+
+      document.getElementById('passed-count').textContent = passed;
+      document.getElementById('failed-count').textContent = 0; // Manual testing doesn't track failures
+      document.getElementById('pending-count').textContent = total - passed;
+    }
+
+    // Add event listeners to all checkboxes
+    document.querySelectorAll('.test-checkbox').forEach(checkbox => {
+      checkbox.addEventListener('change', updateSummary);
+    });
+
+    // Initial count
+    updateSummary();
+  </script>
+</body>
+</html>

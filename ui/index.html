@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kiro</title>
+  <link rel="stylesheet" href="styles/theme.css">
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/components.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header / Title Bar with Search -->
+    <header class="header" data-tauri-drag-region>
+      <div class="title-bar-left" data-tauri-drag-region>
+        <span class="app-title" data-tauri-drag-region>Kiro</span>
+      </div>
+      <div class="search-container">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          class="search-input"
+          id="search-input"
+          placeholder="Search or type to create..."
+          autofocus
+        >
+      </div>
+      <div class="search-hints" data-tauri-drag-region>
+        <span class="search-hint">y:2024</span>
+        <span class="search-hint">m:01/24</span>
+      </div>
+      <div class="window-controls">
+        <button class="window-control" id="win-minimize" title="Minimize">
+          <svg width="12" height="12" viewBox="0 0 12 12">
+            <rect y="5" width="12" height="2" fill="currentColor"/>
+          </svg>
+        </button>
+        <button class="window-control" id="win-maximize" title="Maximize">
+          <svg width="12" height="12" viewBox="0 0 12 12">
+            <rect x="1" y="1" width="10" height="10" stroke="currentColor" stroke-width="1.5" fill="none"/>
+          </svg>
+        </button>
+        <button class="window-control window-control-close" id="win-close" title="Close">
+          <svg width="12" height="12" viewBox="0 0 12 12">
+            <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Results Panel -->
+      <aside class="results-panel" id="results-panel">
+        <div class="results-header">
+          <span class="results-title">Results</span>
+          <span class="results-count" id="results-count">(0)</span>
+        </div>
+        <div class="results-list" id="results-list" tabindex="0">
+          <!-- Results will be inserted here -->
+        </div>
+      </aside>
+
+      <!-- Preview Panel -->
+      <section class="preview-panel" id="preview-panel">
+        <div class="preview-header">
+          <h2 class="preview-title" id="preview-title">Select a note</h2>
+          <div class="preview-meta" id="preview-meta"></div>
+        </div>
+        <div class="preview-content" id="preview-content">
+          <div class="preview-empty">
+            Select a note to view its contents
+          </div>
+        </div>
+      </section>
+
+      <!-- Editor Panel (hidden by default) -->
+      <section class="editor-panel" id="editor-panel">
+        <div class="editor-header">
+          <input
+            type="text"
+            class="editor-title-input"
+            id="editor-title"
+            placeholder="Note title..."
+          >
+          <div class="unsaved-indicator" id="unsaved-indicator" style="display: none;"></div>
+          <div class="editor-actions">
+            <button class="btn btn-secondary" id="editor-cancel">Cancel</button>
+            <button class="btn btn-primary" id="editor-save">Save</button>
+          </div>
+        </div>
+        <textarea
+          class="editor-textarea"
+          id="editor-body"
+          placeholder="Start typing your note..."
+        ></textarea>
+      </section>
+    </main>
+
+    <!-- Footer / Status Bar -->
+    <footer class="footer">
+      <div class="status-left">
+        <span id="status-total">0 notes</span>
+        <span class="status-marked" id="status-marked" style="display: none;">Marked: 0</span>
+      </div>
+      <div class="status-right">
+        <div class="shortcut-hint">
+          <span class="shortcut-key">F2</span>
+          <span>Import</span>
+        </div>
+        <div class="shortcut-hint">
+          <span class="shortcut-key">F3</span>
+          <span>Export</span>
+        </div>
+        <div class="shortcut-hint">
+          <span class="shortcut-key">d</span>
+          <span>Delete</span>
+        </div>
+        <div class="shortcut-hint">
+          <span class="shortcut-key">?</span>
+          <span>Help</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Import Dialog -->
+  <div class="dialog-overlay" id="import-dialog">
+    <div class="dialog import-dialog">
+      <div class="dialog-header">
+        <h3 class="dialog-title">Import Notes</h3>
+        <button class="dialog-close" id="import-close">&times;</button>
+      </div>
+      <div class="dialog-body">
+        <div class="import-section">
+          <div class="import-section-title">Select Directories</div>
+          <div class="directory-list" id="directory-list">
+            <!-- Directory items will be inserted here -->
+          </div>
+        </div>
+        <div class="import-section">
+          <div class="import-section-title">File Filter</div>
+          <div class="file-filter">
+            <input
+              type="text"
+              class="file-filter-input"
+              id="file-filter"
+              value="*.txt"
+              placeholder="*.txt, *.md"
+            >
+            <button class="btn btn-secondary" id="scan-files">Scan</button>
+          </div>
+        </div>
+        <div class="import-section">
+          <div class="import-section-title">Found Files</div>
+          <div class="file-list" id="file-list">
+            <div class="empty-state">
+              <div class="empty-state-description">Select directories and click Scan</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn btn-secondary" id="import-select-all">Select All</button>
+        <button class="btn btn-secondary" id="import-clear">Clear</button>
+        <button class="btn btn-primary" id="import-confirm">Import Selected</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Dialog -->
+  <div class="dialog-overlay" id="confirm-dialog">
+    <div class="dialog confirm-dialog">
+      <div class="dialog-header">
+        <h3 class="dialog-title" id="confirm-title">Confirm</h3>
+        <button class="dialog-close" id="confirm-close">&times;</button>
+      </div>
+      <div class="dialog-body">
+        <p class="confirm-message" id="confirm-message"></p>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn btn-secondary" id="confirm-cancel">Cancel</button>
+        <button class="btn btn-primary" id="confirm-ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Dialog -->
+  <div class="dialog-overlay" id="help-dialog">
+    <div class="dialog help-dialog">
+      <div class="dialog-header">
+        <h3 class="dialog-title">Keyboard Shortcuts</h3>
+        <button class="dialog-close" id="help-close">&times;</button>
+      </div>
+      <div class="dialog-body">
+        <div class="help-section">
+          <div class="help-section-title">Navigation</div>
+          <div class="help-shortcuts">
+            <span class="help-key">↑/↓ or j/k</span>
+            <span class="help-description">Navigate results</span>
+            <span class="help-key">g</span>
+            <span class="help-description">Jump to first result</span>
+            <span class="help-key">G</span>
+            <span class="help-description">Jump to last result</span>
+            <span class="help-key">Ctrl+D</span>
+            <span class="help-description">Page down</span>
+            <span class="help-key">Ctrl+U</span>
+            <span class="help-description">Page up</span>
+            <span class="help-key">Tab</span>
+            <span class="help-description">Toggle focus (search/results)</span>
+          </div>
+        </div>
+        <div class="help-section">
+          <div class="help-section-title">Actions</div>
+          <div class="help-shortcuts">
+            <span class="help-key">Enter</span>
+            <span class="help-description">Edit selected note (or create new)</span>
+            <span class="help-key">Space</span>
+            <span class="help-description">Toggle mark on selected</span>
+            <span class="help-key">a</span>
+            <span class="help-description">Mark all visible</span>
+            <span class="help-key">c</span>
+            <span class="help-description">Clear all marks</span>
+            <span class="help-key">d</span>
+            <span class="help-description">Delete selected/marked</span>
+          </div>
+        </div>
+        <div class="help-section">
+          <div class="help-section-title">Import/Export</div>
+          <div class="help-shortcuts">
+            <span class="help-key">F2</span>
+            <span class="help-description">Open import dialog</span>
+            <span class="help-key">F3</span>
+            <span class="help-description">Export marked notes</span>
+            <span class="help-key">F4</span>
+            <span class="help-description">Configure directories</span>
+          </div>
+        </div>
+        <div class="help-section">
+          <div class="help-section-title">Editor</div>
+          <div class="help-shortcuts">
+            <span class="help-key">Ctrl+S</span>
+            <span class="help-description">Save note</span>
+            <span class="help-key">Escape</span>
+            <span class="help-description">Cancel editing</span>
+          </div>
+        </div>
+        <div class="help-section">
+          <div class="help-section-title">General</div>
+          <div class="help-shortcuts">
+            <span class="help-key">Escape</span>
+            <span class="help-description">Clear search / Close dialog</span>
+            <span class="help-key">Ctrl+Q</span>
+            <span class="help-description">Quit application</span>
+            <span class="help-key">?</span>
+            <span class="help-description">Show this help</span>
+          </div>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn btn-primary" id="help-ok">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Panel (Command Palette Style) -->
+  <div class="settings-overlay" id="settings-overlay">
+    <div class="settings-panel">
+      <div class="settings-header">
+        <div class="settings-search">
+          <span class="settings-search-icon">&#9881;</span>
+          <input type="text" class="settings-search-input" id="settings-search" placeholder="Settings & Commands...">
+        </div>
+        <button class="dialog-close" id="settings-close">&times;</button>
+      </div>
+
+      <div class="settings-tabs">
+        <button class="settings-tab active" data-tab="shortcuts">Shortcuts</button>
+        <button class="settings-tab" data-tab="theme">Theme</button>
+        <button class="settings-tab" data-tab="colors">Colors</button>
+        <button class="settings-tab" data-tab="fonts">Fonts</button>
+      </div>
+
+      <div class="settings-content">
+        <!-- Shortcuts Tab -->
+        <div class="settings-tab-content" id="tab-shortcuts">
+          <div class="shortcuts-list" id="shortcuts-list">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Theme Tab -->
+        <div class="settings-tab-content" id="tab-theme" style="display: none;">
+          <div class="settings-section">
+            <div class="settings-section-title">Theme Presets</div>
+            <div class="theme-grid" id="theme-grid">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Colors Tab -->
+        <div class="settings-tab-content" id="tab-colors" style="display: none;">
+          <div class="settings-section">
+            <div class="settings-section-title">Custom Colors</div>
+            <div class="color-grid" id="color-grid">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Fonts Tab -->
+        <div class="settings-tab-content" id="tab-fonts" style="display: none;">
+          <div class="settings-section">
+            <div class="settings-section-title">Font Settings</div>
+            <div class="font-setting">
+              <label class="font-label">Font Family</label>
+              <select class="font-select" id="font-family-select">
+                <option value="Inter, system-ui, sans-serif">Inter (Default)</option>
+                <option value="system-ui, sans-serif">System UI</option>
+                <option value="'Segoe UI', sans-serif">Segoe UI</option>
+                <option value="Roboto, sans-serif">Roboto</option>
+                <option value="'Open Sans', sans-serif">Open Sans</option>
+                <option value="Lato, sans-serif">Lato</option>
+                <option value="'Source Sans Pro', sans-serif">Source Sans Pro</option>
+                <option value="'Noto Sans', sans-serif">Noto Sans</option>
+                <option value="Georgia, serif">Georgia (Serif)</option>
+                <option value="'Times New Roman', serif">Times New Roman</option>
+              </select>
+            </div>
+            <div class="font-setting">
+              <label class="font-label">Font Size</label>
+              <input type="number" class="font-size-input" id="font-size-input" value="16" min="10" max="24" step="1">
+              <span style="color: var(--text-muted); font-size: var(--font-size-sm);">px</span>
+            </div>
+            <div class="font-setting">
+              <label class="font-label">Mono Font</label>
+              <select class="font-select" id="mono-font-select">
+                <option value="'JetBrains Mono', monospace">JetBrains Mono (Default)</option>
+                <option value="'Fira Code', monospace">Fira Code</option>
+                <option value="Consolas, monospace">Consolas</option>
+                <option value="'Source Code Pro', monospace">Source Code Pro</option>
+                <option value="'Ubuntu Mono', monospace">Ubuntu Mono</option>
+                <option value="Monaco, monospace">Monaco</option>
+                <option value="'Courier New', monospace">Courier New</option>
+              </select>
+            </div>
+            <div class="font-preview">
+              <p class="font-preview-text" id="font-preview">
+                The quick brown fox jumps over the lazy dog.<br>
+                0123456789 !@#$%^&*()
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-footer">
+        <span class="settings-hint">Press Escape to close, Ctrl+, to open</span>
+        <div class="settings-actions">
+          <button class="btn btn-secondary" id="settings-reset">Reset to Default</button>
+          <button class="btn btn-primary" id="settings-save">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/utils.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/import.js"></script>
+  <script src="js/keyboard.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
