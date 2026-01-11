@@ -5,33 +5,8 @@ const WindowControls = {
   init() {
     const { invoke } = window.__TAURI__.core;
 
-    // Drag functionality - attach to header using Tauri's drag region
-    const header = document.querySelector('.header');
-    if (header) {
-      let isDragging = false;
-
-      header.addEventListener('mousedown', async (e) => {
-        // Don't drag if clicking on interactive elements
-        if (e.target.closest('.search-container') ||
-            e.target.closest('.window-controls') ||
-            e.target.closest('button') ||
-            e.target.closest('input')) {
-          return;
-        }
-
-        // Only drag on left mouse button
-        if (e.button !== 0) return;
-
-        isDragging = true;
-        try {
-          await invoke('window_start_drag');
-        } catch (err) {
-          // Silently ignore drag errors - they can occur during rapid clicks
-          console.debug('Drag:', err);
-        }
-        isDragging = false;
-      });
-    }
+    // Window dragging is handled by data-tauri-drag-region attribute in HTML
+    // No manual drag handling needed - Tauri handles it automatically
 
     const minimizeBtn = document.getElementById('win-minimize');
     const maximizeBtn = document.getElementById('win-maximize');

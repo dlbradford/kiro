@@ -9,6 +9,7 @@ html, body {
   height: 100%;
   width: 100%;
   overflow: hidden;
+  background: transparent;
 }
 
 body {
@@ -16,7 +17,7 @@ body {
   font-size: var(--font-size-base);
   line-height: var(--line-height);
   color: var(--text-primary);
-  background-color: var(--bg-primary);
+  background: transparent;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -28,6 +29,9 @@ body {
   height: 100vh;
   overflow: hidden;
   background-color: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border);
 }
 
 /* Header / Title Bar with Search */
@@ -40,6 +44,7 @@ body {
   height: var(--header-height);
   flex-shrink: 0;
   gap: var(--spacing-md);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 .title-bar-left {
@@ -362,6 +367,7 @@ body {
   border-top: 1px solid var(--border);
   height: var(--footer-height);
   flex-shrink: 0;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 
 .status-left {
