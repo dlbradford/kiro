@@ -8,18 +8,13 @@ const Keyboard = {
   },
 
   handleKeyDown(e) {
-    // Don't handle if in editor
+    // Don't handle if in editor (editor handles its own shortcuts)
     if (Editor.isActive) {
       if (e.key === 'Escape') {
         e.preventDefault();
         Editor.handleEscape();
-        return;
       }
-      // Allow Ctrl+S in editor
-      if (e.ctrlKey && e.key === 's') {
-        e.preventDefault();
-        Editor.save();
-      }
+      // Let editor handle Ctrl+S itself to avoid double-save
       return;
     }
 
